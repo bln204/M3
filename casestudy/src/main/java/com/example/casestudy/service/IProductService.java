@@ -7,9 +7,10 @@ import java.util.List;
 
 public interface IProductService {
     List<Product> findAll();
-    void saveProduct(Product product);
+    void saveProduct(String name, int inventory, double price, int directory_id, String description);
     List<Directory> findAllDirectory();
     void deleteProduct(int id);
     Product findById(int id);
-    void updateProduct(Product product);
+    void updateProduct(int id,String name, int inventory, double price, int directory_id, String description);
+    List<Product> searchProduct(double price, String directory);
 }

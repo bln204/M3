@@ -7,6 +7,13 @@ public class Directory {
         this.id = id;
         this.name = name;
     }
+    public Directory(int id) {
+        this.id = id;
+    }
+
+    public Directory(String name) {
+        this.name = name;
+    }
 
     public int getId() {
         return id;
@@ -24,7 +31,5 @@ public class Directory {
         this.name = name;
     }
 
-    public Directory(int id) {
-        this.id = id;
-    }
+
 }

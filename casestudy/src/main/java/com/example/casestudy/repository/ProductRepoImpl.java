@@ -4,12 +4,9 @@ import com.example.casestudy.common.BaseRepository;
 import com.example.casestudy.model.Directory;
 import com.example.casestudy.model.Product;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.Connection;
 
 public class ProductRepoImpl implements IProductRepo {
 
@@ -22,7 +19,15 @@ public class ProductRepoImpl implements IProductRepo {
 
     private static final String FIND_ALL = "CALL GetAllProduct()";
 
-    private static final String INSERT_INTO = "INSERT INTO products (product_name, inventory, price, directory_id, note) VALUES (?,?,?,?,?)";
+    private static final String FIND_BY_ID = "CALL GetProductById(?)";
+
+    private static final String INSERT_INTO = "CALL AddNewProduct(?,?,?,?,?)";
+
+    private static final String FIND_ALL_DIRECTORY = "SELECT * FROM directories";
+
+    private static final String UPDATE = "UPDATE products SET product_name =?, inventory =?," +
+            " price =?, directory_id =?, note =? WHERE product_id =?";
+
     @Override
     public List<Product> findAll() {
         Connection connection = baseRepository.getConnection();
@@ -47,12 +52,13 @@ public class ProductRepoImpl implements IProductRepo {
         return list;
     }
 
+
     @Override
     public List<Directory> findAllDirectory() {
         Connection connection = baseRepository.getConnection();
         List<Directory> list = new ArrayList<>();
         try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM directories");
+            PreparedStatement statement = connection.prepareStatement(FIND_ALL_DIRECTORY);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()){
                 int id = resultSet.getInt("directory_id");
@@ -66,15 +72,15 @@ public class ProductRepoImpl implements IProductRepo {
     }
 
     @Override
-    public void saveProduct(Product product) {
+    public void saveProduct(String name, int inventory, double price, int directory_id, String description) {
         Connection connection = baseRepository.getConnection();
         try {
-            PreparedStatement statement = connection.prepareStatement(INSERT_INTO);
-            statement.setString(1, product.getName());
-            statement.setInt(2, product.getInventory());
-            statement.setDouble(3, product.getPrice());
-            statement.setInt(4, product.getDirectory().getId());
-            statement.setString(5, product.getDescription());
+            CallableStatement statement = connection.prepareCall(INSERT_INTO);
+            statement.setString(1, name);
+            statement.setInt(2, inventory);
+            statement.setDouble(3, price);
+            statement.setInt(4, directory_id);
+            statement.setString(5, description);
             statement.executeUpdate();
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -98,7 +104,7 @@ public class ProductRepoImpl implements IProductRepo {
         Connection connection = baseRepository.getConnection();
         Product product = null;
         try{
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE product_id =?");
+            PreparedStatement statement = connection.prepareStatement(FIND_BY_ID);
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if(resultSet.next()){
@@ -118,19 +124,62 @@ public class ProductRepoImpl implements IProductRepo {
     }
 
     @Override
-    public void updateProduct(Product product) {
+    public void updateProduct( int id,String name, int inventory, double price, int directory_id,String description) {
         Connection connection = baseRepository.getConnection();
         try {
-            PreparedStatement statement = connection.prepareStatement("UPDATE products SET product_name =?, inventory =?, price =?, directory_id =?, note =? WHERE product_id =?");
-            statement.setString(1, product.getName());
-            statement.setInt(2, product.getInventory());
-            statement.setDouble(3, product.getPrice());
-            statement.setInt(4, product.getDirectory().getId());
-            statement.setString(5, product.getDescription());
-            statement.setInt(6, product.getId());
+            PreparedStatement statement = connection.prepareStatement(UPDATE);
+            statement.setString(1, name);
+            statement.setInt(2, inventory);
+            statement.setDouble(3, price);
+            statement.setInt(4, directory_id);
+            statement.setString(5, description);
+            statement.setInt(6, id);
             statement.executeUpdate();
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    @Override
+    public List<Product> searchProduct(double price, String directory) {
+        Connection connection = baseRepository.getConnection();
+        List<Product> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder
+                ("SELECT p.product_id, p.product_name, p.inventory, p.price, p.note, d.directory_name " +
+                        "FROM products p JOIN directories d ON p.directory_id = d.directory_id WHERE 1=1 ");
+        if(directory!= null && !directory.isEmpty()) {
+            sql.append(" AND d.directory_name =?");
+//            sử dụng LIKE %
+        }
+        if(price > 0){
+            sql.append(" AND p.price =?");
+        }
+
+        try(PreparedStatement statement = connection.prepareStatement(sql.toString())){
+            if(directory!= null && !directory.isEmpty() ){
+                statement.setString(1, directory);
+            }
+            if(price > 0 && (directory == null || directory.isEmpty())){
+                statement.setDouble(1, price);
+            }
+            if(price > 0 && directory != null && !directory.isEmpty()){
+                statement.setDouble(2, price);
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while(resultSet.next()){
+                int id = resultSet.getInt("product_id");
+                String name = resultSet.getString("product_name");
+                int inventory = resultSet.getInt("inventory");
+                double priceValue = resultSet.getDouble("price");
+                String description = resultSet.getString("note");
+                String directoryName = resultSet.getString("directory_name");
+                list.add(new Product(id, name, inventory, new Directory(directoryName), priceValue, description));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return list;
     }
 }

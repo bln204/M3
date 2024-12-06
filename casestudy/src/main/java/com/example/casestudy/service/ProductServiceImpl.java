@@ -23,8 +23,8 @@ public class ProductServiceImpl implements IProductService{
     }
 
     @Override
-    public void saveProduct(Product product) {
-        productRepo.saveProduct(product);
+    public void saveProduct(String name, int inventory, double price, int directory_id, String description) {
+        productRepo.saveProduct(name, inventory, price, directory_id, description);
     }
 
     @Override
@@ -37,7 +37,12 @@ public class ProductServiceImpl implements IProductService{
     }
 
     @Override
-    public void updateProduct(Product product) {
-        productRepo.updateProduct(product);
+    public void updateProduct(int id,String name, int inventory, double price, int directory_id, String description) {
+        productRepo.updateProduct(id,name,inventory, price, directory_id, description);
+    }
+
+    @Override
+    public List<Product> searchProduct(double price, String directory) {
+        return productRepo.searchProduct(price, directory);
     }
 }

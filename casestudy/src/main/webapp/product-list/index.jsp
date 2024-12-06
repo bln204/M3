@@ -19,20 +19,21 @@
             <h1 class="text-center mb-4">Danh sách sản phẩm</h1>
         </tr>
 
-<%--        <tr>--%>
-<%--            <div>--%>
-<%--                <form action="?action=search" method="get" class="row g-3">--%>
-<%--                    <input type="hidden" name="action" value="search">--%>
+        <tr>
+            <div>
+                <form action="?action=search" method="get" class="row g-3">
+                    <input type="hidden" name="action" value="search">
 
-<%--                    <div class="col-sm-12 d-flex justify-content-start">--%>
-<%--                        <input type="text" class="form-control me-2" name="productName" value="${key}" placeholder="Nhập tên sản phẩm để tìm kiếm">--%>
-<%--                        <button type="submit" class="btn btn-primary btn-sm">--%>
-<%--                            <i class="bi bi-search"></i>--%>
-<%--                        </button>--%>
-<%--                    </div>--%>
-<%--                </form>--%>
-<%--            </div>--%>
-<%--        </tr>--%>
+                    <div class="col-sm-12 d-flex justify-content-start">
+                        <input type="number" class="form-control me-2" name="price" value="${sPrice}" placeholder="Nhập giá tiền để tìm kiếm">
+                        <input type="text" class="form-control me-2" name="directory" value="${sDirectory}" placeholder="Nhập tên danh mục để tìm kiếm">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </tr>
 
         <tr>
             <th>ID</th>
@@ -46,9 +47,9 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${productList}" var="p">
+        <c:forEach items="${productList}" var="p" varStatus="status">
             <tr>
-                <td>${p.id}</td>
+                <td>${status.index+1}</td>
                 <td>${p.name}</td>
                 <td>${p.inventory}</td>
                 <td>${p.directory.name}</td>
@@ -98,7 +99,7 @@
         $('#mainTable').DataTable({
             "dom": 'lrtip',
             "lengthChange": false,
-            "pageLength": 5,
+            "pageLength": 8,
             "columnDefs": [
                 { "orderable": false, "targets": [6, 7] }
             ]

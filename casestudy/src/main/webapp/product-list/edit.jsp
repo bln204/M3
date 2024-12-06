@@ -33,8 +33,8 @@
             <label for="directory" class="form-label">Danh mục:</label>
             <select class="form-select" id="directory" name="directory" required>
                 <c:forEach items="${directories}" var="dir">
-                    <option value="${dir.directory_id}" ${dir.directory_id == product.directory_id ? "selected" : ""}>
-                            ${dir.directory_name}
+                    <option value="${dir.id}" ${dir.id == product.directory.id ? 'selected' : ''}>
+                            ${dir.name}
                     </option>
                 </c:forEach>
             </select>
@@ -47,7 +47,7 @@
         
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Cập nhật</button>
-            <a href="/product-list/index.jsp" class="btn btn-secondary">Quay lại</a>
+            <a href="?action=" class="btn btn-secondary">Quay lại</a>
         </div>
     </form>
 </div>
