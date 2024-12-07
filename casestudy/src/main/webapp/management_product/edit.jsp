@@ -21,12 +21,12 @@
 
         <div class="mb-3">
             <label for="inventory" class="form-label">Số lượng tồn kho:</label>
-            <input type="number" class="form-control" id="inventory" name="inventory" value="${inventoryUpdate}" min="0" >
+            <input type="number" class="form-control" id="inventory" name="inventory" value="${inventoryUpdate}"  >
         </div>
 
         <div class="mb-3">
             <label for="price" class="form-label">Giá tiền:</label>
-            <input type="number" class="form-control" id="price" name="price" value="${priceUpdate}" min="0" step="0.01" >
+            <input type="number" class="form-control" id="price" name="price" value="${priceUpdate}" step="0.01" >
         </div>
 
         <div class="mb-3">
