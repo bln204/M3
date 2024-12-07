@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-
 <div class="container">
     <table class="table table-striped table-bordered table-hover" id="mainTable">
         <thead class="table-dark">
@@ -88,6 +88,26 @@
     </div>
 </div>
 
+<%--Modal thông báo price < 0 khi search--%>
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="errorModalLabel">Lỗi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <c:if test="${not empty errorMessage}">
+                    <p>${errorMessage}</p>
+                </c:if>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -95,13 +115,13 @@
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#mainTable').DataTable({
             "dom": 'lrtip',
             "lengthChange": false,
             "pageLength": 8,
             "columnDefs": [
-                { "orderable": false, "targets": [6, 7] }
+                {"orderable": false, "targets": [6, 7]}
             ]
         });
     });
@@ -119,6 +139,16 @@
         var confirmDeleteLink = deleteModal.querySelector('.modal-footer #confirmDelete');
         confirmDeleteLink.setAttribute('href', '?action=delete&id=' + productId);
     });
+
+
+    // Handling price < 0 error modal
+        $(document).ready(function() {
+        // Show error modal if errorMessage is set
+        <c:if test="${not empty errorMessage}">
+        $('#errorModal').modal('show');
+        </c:if>
+    });
+
 </script>
 
 </body>

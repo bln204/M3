@@ -40,7 +40,6 @@
             <textarea class="form-control" id="description" name="description" rows="3" value="${description}"></textarea>
         </div>
 
-<%--        <button type="submit" class="btn btn-primary">Thêm mới sản phẩm</button>--%>
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Thêm mới sản phẩm</button>
             <a href="?action=" class="btn btn-secondary">Quay lại</a>

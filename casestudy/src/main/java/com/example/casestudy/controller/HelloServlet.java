@@ -58,19 +58,28 @@ public class HelloServlet extends HttpServlet {
     private void showUpdateForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         int id = Integer.parseInt(request.getParameter("id"));
         Product product = productService.findById(id);
-        List<Directory> directories = productService.findAllDirectory();
-        request.setAttribute("directories", directories);
-        request.setAttribute("product", product);
-        request.getRequestDispatcher("/product-list/edit.jsp").forward(request, response);
+        forwardUpdate(request, response,product.getId(),product.getName(),product.getInventory()+"",product.getPrice()+"",product.getDirectory().getId(),product.getDescription());
     }
 
     private void searchProduct(HttpServletRequest request, HttpServletResponse response){
         String sPrice = request.getParameter("price");
         double price = 0;
         if(sPrice != null && !sPrice.isEmpty()){
-            price = Double.parseDouble(sPrice);
+            if ((price > 0)) {
+                price = Double.parseDouble(sPrice);
+            } else {
+                request.setAttribute("errorMessage", "Giá không thể nhỏ hơn 0. Vui lòng nhập lại.");
+                List<Product> list = productService.findAll(); // Thêm phương thức này để lấy toàn bộ sản phẩm
+                request.setAttribute("productList", list);
+                try {
+                    request.getRequestDispatcher("/product-list/index.jsp").forward(request, response);
+                } catch (ServletException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
         }
-//        check giá nhỏ hơn 0
+
         String directory = request.getParameter("directory");
         List<Product> list = productService.searchProduct(price,directory);
         request.setAttribute("productList", list);
@@ -182,45 +191,45 @@ public class HelloServlet extends HttpServlet {
         String sInventory = request.getParameter("inventory");
         String sPrice = request.getParameter("price");
         int directory_id = Integer.parseInt(request.getParameter("directory"));
-        String description = request.getParameter("note");
+        String description = request.getParameter("description");
         if (name == null || name.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Tên sản phẩm không được để trống!!");
-            forwardCreate(request, response, name, sInventory, sPrice, directory_id, description);
+            forwardUpdate(request, response,id, name, sInventory, sPrice, directory_id, description);
             return;
         }
         if(validateName(name)){
             request.setAttribute("errorMessage", "Tên sản phẩm chỉ chứa ký tự và khoảng trắng!!");
-            forwardCreate(request, response, name, sInventory, sPrice, directory_id, description);
+            forwardUpdate(request, response, id, name, sInventory, sPrice, directory_id, description);
             return;
         }
 
         if(sInventory == null || sInventory.isEmpty()) {
             request.setAttribute("errorMessage", "Số lượng không được để trống!!");
-            forwardCreate(request, response, name, sInventory, sPrice, directory_id, description);
+            forwardUpdate(request, response,id, name, sInventory, sPrice, directory_id, description);
             return;
         }
         int inventory = Integer.parseInt(sInventory);
 
         if(inventory <= 0){
             request.setAttribute("errorMessage", "Số lượng phải lớn hơn 0!!");
-            forwardCreate(request, response, name, sInventory, sPrice, directory_id, description);
+            forwardUpdate(request, response,id, name, sInventory, sPrice, directory_id, description);
             return;
         }
 
         if(sPrice == null || sPrice.isEmpty()) {
             request.setAttribute("errorMessage", "Giá sản phẩm không được để trống!!");
-            forwardCreate(request, response, name, sInventory, sPrice, directory_id, description);
+            forwardUpdate(request, response,id, name, sInventory, sPrice, directory_id, description);
             return;
         }
         double price = Double.parseDouble(sPrice);
         if(price <= 0){
             request.setAttribute("errorMessage", "Giá sản phẩm phải lớn hơn 0!!");
-            forwardCreate(request, response, name, sInventory, sPrice, directory_id, description);
+            forwardUpdate(request, response,id, name, sInventory, sPrice, directory_id, description);
             return;
         }
         if(description == null || description.isEmpty()){
             request.setAttribute("errorMessage", "Mô tả sản phẩm không được để trống!!");
-            forwardCreate(request, response, name, sInventory, sPrice, directory_id, description);
+            forwardUpdate(request, response,id, name, sInventory, sPrice, directory_id, description);
             return;
         }
         productService.updateProduct(id, name, inventory, price, directory_id, description);
@@ -232,7 +241,7 @@ public class HelloServlet extends HttpServlet {
     }
 
     private boolean validateName(String name) {
-        return !name.matches("^[\\p{L}\\s-]{1,255}$");
+        return !name.matches("^[\\p{L}\\d\\s-]{1,255}$");
     }
 
     private void forwardCreate(HttpServletRequest request, HttpServletResponse response,String name, String inventory,String price, int directory_id, String description){
@@ -245,6 +254,23 @@ public class HelloServlet extends HttpServlet {
 
         request.setAttribute("directories", directoryList);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/product-list/create.jsp");
+        try {
+            dispatcher.forward(request, response);
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void forwardUpdate(HttpServletRequest request, HttpServletResponse response, int id, String name, String inventory, String price, int directory_id, String description){
+        List<Directory> directoryList = productService.findAllDirectory();
+        request.setAttribute("idUpdate", id);
+        request.setAttribute("nameUpdate", name);
+        request.setAttribute("inventoryUpdate", inventory);
+        request.setAttribute("priceUpdate", price);
+        request.setAttribute("directory_id_update", directory_id);
+        request.setAttribute("descriptionUpdate", description);
+
+        request.setAttribute("directories", directoryList);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/product-list/edit.jsp");
         try {
             dispatcher.forward(request, response);
         } catch (ServletException | IOException e) {

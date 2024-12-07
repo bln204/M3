@@ -148,8 +148,7 @@ public class ProductRepoImpl implements IProductRepo {
                 ("SELECT p.product_id, p.product_name, p.inventory, p.price, p.note, d.directory_name " +
                         "FROM products p JOIN directories d ON p.directory_id = d.directory_id WHERE 1=1 ");
         if(directory!= null && !directory.isEmpty()) {
-            sql.append(" AND d.directory_name =?");
-//            sử dụng LIKE %
+            sql.append(" AND d.directory_name LIKE ?");
         }
         if(price > 0){
             sql.append(" AND p.price =?");
@@ -179,7 +178,6 @@ public class ProductRepoImpl implements IProductRepo {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
         return list;
     }
 }
