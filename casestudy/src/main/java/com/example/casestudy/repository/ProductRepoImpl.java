@@ -25,8 +25,7 @@
 
         private static final String FIND_ALL_DIRECTORY = "SELECT * FROM directories";
 
-        private static final String UPDATE = "UPDATE products SET product_name =?, inventory =?," +
-                " price =?, directory_id =?, note =? WHERE product_id =?";
+        private static final String UPDATE = "CALL UpdateProduct(?,?,?,?,?,?)";
 
         @Override
         public List<Product> findAll() {
